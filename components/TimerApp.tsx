@@ -1,5 +1,6 @@
 "use client";
 
+import Controls from "./Controls";
 import TimerDisplay from "./TimerDisplay";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
@@ -12,8 +13,9 @@ export default function TimerApp() {
 						作業時間
 					</CardTitle>
 				</CardHeader>
-				<CardContent className="flex justify-center">
+				<CardContent className="flex flex-col items-center gap-6">
 					<TimerDisplay minutes={25} seconds={0} />
+					<Controls />
 				</CardContent>
 			</Card>
 		</div>
