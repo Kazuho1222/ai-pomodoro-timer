@@ -60,6 +60,7 @@ export default function TimerApp() {
 						// 分数が0の場合（タイマー終了）
 						if (prev.minutes === 0) {
 							setIsRunning(false); // タイマーを停止
+							toggleMode(); // モードを自動切り替え
 							return prev; // 現在の状態（0分0秒）を返す
 						}
 						// 分数がまだ残っている場合は、分を1減らして秒を59にセット
@@ -68,7 +69,7 @@ export default function TimerApp() {
 					// 秒数が1以上の場合は、秒を1減らす
 					return { ...prev, seconds: prev.seconds - 1 };
 				});
-			}, 1000);
+			}, 1); // 動作確認用に1ミリ秒ごとに実行
 		}
 
 		// クリーンアップ関数（コンポーネントのアンマウント時やisRunningが変わる前に実行される）
