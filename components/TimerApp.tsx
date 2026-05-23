@@ -42,7 +42,7 @@ export default function TimerApp() {
 	// リセットボタンのハンドラ
 	const handleReset = () => {
 		setIsRunning(false);
-		setTimeLeft({ minutes: 25, seconds: 0 });
+		setTimeLeft({ minutes: mode === "work" ? 25 : 5, seconds: 0 });
 	};
 
 	useEffect(() => {
