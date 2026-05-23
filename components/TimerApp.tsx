@@ -92,7 +92,11 @@ export default function TimerApp() {
 					</CardTitle>
 				</CardHeader>
 				<CardContent className="flex flex-col items-center gap-6">
-					<TimerDisplay minutes={timeLeft.minutes} seconds={timeLeft.seconds} />
+					<TimerDisplay
+						minutes={timeLeft.minutes}
+						seconds={timeLeft.seconds}
+						mode={mode}
+					/>
 					<Controls
 						onStart={handleStart}
 						onReset={handleReset}
