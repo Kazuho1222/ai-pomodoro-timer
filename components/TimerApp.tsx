@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Controls from "./Controls";
 import TimerDisplay from "./TimerDisplay";
 import { playNotificationSounds } from "@/utils/sounds";
+import MetadataUpdater from "./MetadataUpdater";
 
 // タイマーのモードを表す型
 type Mode = "work" | "break";
@@ -105,6 +106,11 @@ export default function TimerApp() {
 					/>
 				</CardContent>
 			</Card>
+			<MetadataUpdater
+				minutes={timeLeft.minutes}
+				seconds={timeLeft.seconds}
+				mode={mode}
+			/>
 		</div>
 	);
 }
