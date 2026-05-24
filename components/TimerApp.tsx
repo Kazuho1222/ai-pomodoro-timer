@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Controls from "./Controls";
-import TimerDisplay from "./TimerDisplay";
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { playNotificationSounds } from "@/utils/sounds";
+import Controls from "./Controls";
 import MetadataUpdater from "./MetadataUpdater";
+import TimerDisplay from "./TimerDisplay";
 
 // タイマーのモードを表す型
 type Mode = "work" | "break";
@@ -14,8 +20,14 @@ export default function TimerApp() {
 	// タイマーの実行状態を管理するstate
 	const [isRunning, setIsRunning] = useState(false);
 
+	// 作業時間を管理する状態変数
+	const [workDuration, setWorkDuration] = useState(25);
+
 	// タイマーの残り時間を保持する状態変数
-	const [timeLeft, setTimeLeft] = useState({ minutes: 25, seconds: 0 });
+	const [timeLeft, setTimeLeft] = useState({
+		minutes: workDuration,
+		seconds: 0,
+	});
 
 	// モードの状態を管理する変数
 	const [mode, setMode] = useState<Mode>("work");
@@ -29,9 +41,10 @@ export default function TimerApp() {
 		// モードに応じてタイマーの時間をリセット
 		// 作業モードなら25分、休憩モードなら5分
 		setTimeLeft({
-			minutes: newMode === "work" ? 25 : 5,
+			minutes: newMode === "work" ? workDuration : 5,
 			seconds: 0,
 		});
+
 		// タイマーを停止状態にする
 		setIsRunning(false);
 	};
@@ -44,11 +57,14 @@ export default function TimerApp() {
 	// リセットボタンのハンドラ
 	const handleReset = () => {
 		setIsRunning(false);
-		setTimeLeft({ minutes: mode === "work" ? 25 : 5, seconds: 0 });
+		setTimeLeft({
+			minutes: mode === "work" ? workDuration : 5,
+			seconds: 0,
+		});
 	};
 
 	useEffect(() => {
-		// setIntervalの戻り値（タイマーID）を保持する変数
+		// setIntervelの戻り値（タイマーID）を保持する変数
 		let intervalId: NodeJS.Timeout;
 
 		// タイマーが実行中の場合のみ処理を行う
@@ -82,14 +98,14 @@ export default function TimerApp() {
 				clearInterval(intervalId);
 			}
 		};
-	}, [isRunning]); // isRunningが変わったときだけこのエフェクトを再実行
+	}, [isRunning, toggleMode]); // isRunningが変わったときだけこのエフェクトを再実行
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4">
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle className="text-2xl font-bold  text-center">
-						{mode === "work" ? "作業中" : "休憩時間"}
+						{mode === "work" ? "作業時間" : "休憩時間"}
 					</CardTitle>
 				</CardHeader>
 				<CardContent className="flex flex-col items-center gap-6">
@@ -105,6 +121,26 @@ export default function TimerApp() {
 						isRunning={isRunning}
 					/>
 				</CardContent>
+				<CardFooter className="flex justify-center gap-2 items-center">
+					<label className="text-sm font-medium">作業時間</label>
+					<select
+						value={workDuration}
+						onChange={(e) => {
+							const newDuration = parseInt(e.target.value, 10);
+							setWorkDuration(newDuration);
+							if (mode === "work" && !isRunning) {
+								setTimeLeft({ minutes: newDuration, seconds: 0 });
+							}
+						}}
+						className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+					>
+						{[5, 10, 15, 30, 45, 60].map((minutes) => (
+							<option key={minutes} value={minutes}>
+								{minutes}分
+							</option>
+						))}
+					</select>
+				</CardFooter>
 			</Card>
 			<MetadataUpdater
 				minutes={timeLeft.minutes}
