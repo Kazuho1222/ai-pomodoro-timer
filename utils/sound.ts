@@ -1,4 +1,4 @@
-export async function playNotificationSounds() {
+export async function playNotificationSound() {
 	try {
 		// Audioオブジェクトを作成
 		const audio = new Audio("/notification.mp3");
