@@ -1,19 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useReward } from "react-rewards";
 import {
 	Card,
 	CardContent,
+	CardFooter,
 	CardHeader,
 	CardTitle,
-	CardFooter,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { playNotificationSound } from "@/utils/sound";
 import Controls from "./Controls";
 import MetadataUpdater from "./MetadataUpdater";
 import TimerDisplay from "./TimerDisplay";
-import { useState, useEffect, useRef } from "react";
-import { useReward } from "react-rewards";
-import { playNotificationSound } from "@/utils/sound";
 
 // タイマーのモードを表す型
 type Mode = "work" | "break";
@@ -122,7 +122,7 @@ export default function TimerApp() {
 				clearInterval(intervalId);
 			}
 		};
-	}, [isRunning]); // isRunningが変わったときだけこのエフェクトを再実行
+	}, [isRunning, toggleMode, mode, confetti]); // isRunningが変わったときだけこのエフェクトを再実行
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
@@ -158,7 +158,7 @@ export default function TimerApp() {
 						<select
 							value={workDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value);
+								const newDuration = parseInt(e.target.value, 10);
 								setWorkDuration(newDuration);
 								if (mode === "work" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
@@ -182,7 +182,7 @@ export default function TimerApp() {
 						<select
 							value={breakDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value);
+								const newDuration = parseInt(e.target.value, 10);
 								setBreakDuration(newDuration);
 								if (mode === "break" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
