@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useReward } from "react-rewards";
 import {
 	Card,
 	CardContent,
-	CardFooter,
 	CardHeader,
 	CardTitle,
+	CardFooter,
 } from "@/components/ui/card";
-import { playNotificationSound } from "@/utils/sound";
+import { Switch } from "@/components/ui/switch";
 import Controls from "./Controls";
 import MetadataUpdater from "./MetadataUpdater";
 import TimerDisplay from "./TimerDisplay";
+import { useState, useEffect, useRef } from "react";
+import { useReward } from "react-rewards";
+import { playNotificationSound } from "@/utils/sound";
 
 // タイマーのモードを表す型
 type Mode = "work" | "break";
@@ -28,6 +29,7 @@ export default function TimerApp() {
 			lifetime: 150,
 		},
 	);
+
 	// タイマーの実行状態を管理するstate
 	const [isRunning, setIsRunning] = useState(false);
 
@@ -45,6 +47,7 @@ export default function TimerApp() {
 	const [mode, setMode] = useState<Mode>("work");
 
 	// 自動開始の設定
+	const [autoStart, setAutoStart] = useState(false);
 
 	// モードを切り替える関数
 	const toggleMode = () => {
@@ -59,8 +62,8 @@ export default function TimerApp() {
 			seconds: 0,
 		});
 
-		// タイマーを停止状態にする
-		setIsRunning(false);
+		// 自動開始がONの場合は次のセッションを自動的に開始
+		setIsRunning(autoStart);
 	};
 
 	// 開始/停止ボタンのハンドラ
@@ -92,11 +95,15 @@ export default function TimerApp() {
 						// 分数が0の場合（タイマー終了）
 						if (prev.minutes === 0) {
 							setIsRunning(false); // タイマーを停止
-							toggleMode(); // モードを自動切り替え
 							if (mode === "work") {
 								void confetti(); // 紙吹雪を表示
 							}
 							void playNotificationSound();
+
+							// 少し遅延させてからモード切り替えと自動開始を実行
+							setTimeout(() => {
+								toggleMode(); // モードを自動切り替え
+							}, 100);
 							return prev; // 現在の状態（0分0秒）を返す
 						}
 						// 分数がまだ残っている場合は、分を1減らして秒を59にセット
@@ -115,7 +122,7 @@ export default function TimerApp() {
 				clearInterval(intervalId);
 			}
 		};
-	}, [isRunning, toggleMode, confetti]); // isRunningが変わったときだけこのエフェクトを再実行
+	}, [isRunning]); // isRunningが変わったときだけこのエフェクトを再実行
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
@@ -151,7 +158,7 @@ export default function TimerApp() {
 						<select
 							value={workDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value, 10);
+								const newDuration = parseInt(e.target.value);
 								setWorkDuration(newDuration);
 								if (mode === "work" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
@@ -175,7 +182,7 @@ export default function TimerApp() {
 						<select
 							value={breakDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value, 10);
+								const newDuration = parseInt(e.target.value);
 								setBreakDuration(newDuration);
 								if (mode === "break" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
@@ -189,6 +196,17 @@ export default function TimerApp() {
 								</option>
 							))}
 						</select>
+					</div>
+
+					{/* 自動開始の設定 */}
+					<div className="flex items-center gap-2 w-full justify-between">
+						<label className="text-sm font-medium min-w-[4.5rem]">
+							自動開始
+						</label>
+						<Switch
+							checked={autoStart}
+							onCheckedChange={() => setAutoStart(!autoStart)}
+						/>
 					</div>
 				</CardFooter>
 			</Card>
