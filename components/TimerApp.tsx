@@ -164,7 +164,7 @@ export default function TimerApp() {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
 								}
 							}}
-							className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
 						>
 							{[5, 10, 15, 25, 30, 45, 60].map((minutes) => (
 								<option key={minutes} value={minutes}>
@@ -188,7 +188,7 @@ export default function TimerApp() {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
 								}
 							}}
-							className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
 						>
 							{[5, 10, 15].map((minutes) => (
 								<option key={minutes} value={minutes}>
@@ -206,6 +206,7 @@ export default function TimerApp() {
 						<Switch
 							checked={autoStart}
 							onCheckedChange={() => setAutoStart(!autoStart)}
+							className="cursor-pointer"
 						/>
 					</div>
 				</CardFooter>
