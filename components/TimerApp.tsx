@@ -14,6 +14,7 @@ import { playNotificationSound } from "@/utils/sound";
 import Controls from "./Controls";
 import MetadataUpdater from "./MetadataUpdater";
 import TimerDisplay from "./TimerDisplay";
+import { generateRefreshSuggestion } from "@/utils/gemini";
 
 // タイマーのモードを表す型
 type Mode = "work" | "break";
@@ -123,6 +124,16 @@ export default function TimerApp() {
 			}
 		};
 	}, [isRunning, toggleMode, mode, confetti]); // isRunningが変わったときだけこのエフェクトを再実行
+
+	// // ================== 動作確認用ここから ==================
+	// useEffect(() => {
+	//   const testGemini = async () => {
+	//     const suggestion = await generateRefreshSuggestion();
+	//     console.log(suggestion);
+	//   }
+	//   testGemini();
+	// }, []);
+	// // ================== 動作確認用ここまで ==================
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
