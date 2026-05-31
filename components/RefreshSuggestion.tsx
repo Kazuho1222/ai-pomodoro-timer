@@ -27,16 +27,18 @@ export default function RefreshSuggestion({
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
-					exit={{ opacity: 0, y: -20 }}
-					className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white- p-4 rounded-lg border border-gray-200 "
+					exit={{ opacity: 0, y: 20 }}
+					className="fixed -bottom-4 left-1/2 transform -translate-x-1/2 bg-indigo-50 p-6 rounded-lg shadow-lg border border-indigo-200 w-full max-w-md"
 				>
 					<button
 						onClick={onClose}
-						className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 cursor-pointer"
+						className="absolute top-3 right-3 text-indigo-400 hover:text-indigo-600 cursor-pointer"
 					>
 						<X size={16} />
 					</button>
-					<p className="text-lg font-medium text-gray-700 pr-6">{suggestion}</p>
+					<p className="text-lg font-medium text-indigo-700 pr-6 text-center">
+						{suggestion}
+					</p>
 				</motion.div>
 			)}
 		</AnimatePresence>

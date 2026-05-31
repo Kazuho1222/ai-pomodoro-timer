@@ -125,7 +125,7 @@ export default function TimerApp() {
 					// 秒数が1以上の場合は、秒を1減らす
 					return { ...prev, seconds: prev.seconds - 1 };
 				});
-			}, 1); // 動作確認用に1ミリ秒ごとに実行
+			}, 1000);
 		}
 
 		// クリーンアップ関数（コンポーネントのアンマウント時やisRunningが変わる前に実行される）
@@ -135,17 +135,7 @@ export default function TimerApp() {
 				clearInterval(intervalId);
 			}
 		};
-	}, [isRunning, toggleMode, mode, confetti]); // isRunningが変わったときだけこのエフェクトを再実行
-
-	// // ================== 動作確認用ここから ==================
-	// useEffect(() => {
-	//   const testGemini = async () => {
-	//     const suggestion = await generateRefreshSuggestion();
-	//     console.log(suggestion);
-	//   }
-	//   testGemini();
-	// }, []);
-	// // ================== 動作確認用ここまで ==================
+	}, [isRunning]); // isRunningが変わったときだけこのエフェクトを再実行
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
@@ -181,7 +171,7 @@ export default function TimerApp() {
 						<select
 							value={workDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value, 10);
+								const newDuration = parseInt(e.target.value);
 								setWorkDuration(newDuration);
 								if (mode === "work" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
@@ -205,7 +195,7 @@ export default function TimerApp() {
 						<select
 							value={breakDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value, 10);
+								const newDuration = parseInt(e.target.value);
 								setBreakDuration(newDuration);
 								if (mode === "break" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
