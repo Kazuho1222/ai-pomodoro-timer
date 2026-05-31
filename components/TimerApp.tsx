@@ -10,12 +10,12 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { generateRefreshSuggestion } from "@/utils/gemini";
 import { playNotificationSound } from "@/utils/sound";
 import Controls from "./Controls";
 import MetadataUpdater from "./MetadataUpdater";
-import TimerDisplay from "./TimerDisplay";
-import { generateRefreshSuggestion } from "@/utils/gemini";
 import RefreshSuggestion from "./RefreshSuggestion";
+import TimerDisplay from "./TimerDisplay";
 
 // タイマーのモードを表す型
 type Mode = "work" | "break";
@@ -68,6 +68,12 @@ export default function TimerApp() {
 			minutes: newMode === "work" ? workDuration : breakDuration,
 			seconds: 0,
 		});
+
+		if (newMode === "break") {
+			generateRefreshSuggestion()
+				.then((suggestion) => setRefreshSuggestion(suggestion))
+				.catch(console.error);
+		}
 
 		// 自動開始がONの場合は次のセッションを自動的に開始
 		setIsRunning(autoStart);
@@ -234,7 +240,7 @@ export default function TimerApp() {
 				mode={mode}
 			/>
 			<RefreshSuggestion
-				suggestion={"hoge"}
+				suggestion={refreshSuggestion}
 				onClose={() => setRefreshSuggestion(null)}
 			/>
 		</div>
