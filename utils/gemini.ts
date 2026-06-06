@@ -3,6 +3,9 @@ export async function generateRefreshSuggestion(): Promise<string> {
 	try {
 		// APIを呼び出す
 		const response = await fetch("/api/refresh-suggestion");
+		if (!response.ok) {
+			throw new Error("Failed to fetch refresh suggestion");
+		}
 		const data = await response.json();
 		return data.suggestion;
 	} catch (error) {

@@ -21,16 +21,12 @@ import TimerDisplay from "./TimerDisplay";
 type Mode = "work" | "break";
 
 export default function TimerApp() {
-	const { reward: confetti, isAnimating } = useReward(
-		"confettiReward",
-		"confetti",
-		{
-			elementCount: 100,
-			spread: 70,
-			decay: 0.93,
-			lifetime: 150,
-		},
-	);
+	const { reward: confetti } = useReward("confettiReward", "confetti", {
+		elementCount: 100,
+		spread: 70,
+		decay: 0.93,
+		lifetime: 150,
+	});
 
 	// タイマーの実行状態を管理するstate
 	const [isRunning, setIsRunning] = useState(false);

@@ -23,9 +23,17 @@ export async function GET() {
 	- 室内で少し歩こう🚶
 	`;
 
-	const response = await ai.models.generateContent({
-		model: "gemini-2.5-flash-lite",
-		contents: prompt,
-	});
-	return NextResponse.json({ suggestion: response.text }, { status: 200 });
+	try {
+		const response = await ai.models.generateContent({
+			model: "gemini-2.5-flash-lite",
+			contents: prompt,
+		});
+		return NextResponse.json({ suggestion: response.text }, { status: 200 });
+	} catch (error) {
+		console.error(error);
+		return NextResponse.json(
+			{ suggestion: "エラーが発生しました" },
+			{ status: 500 },
+		);
+	}
 }
