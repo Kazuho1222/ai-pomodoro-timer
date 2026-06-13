@@ -1,5 +1,5 @@
+import { Pause, Play, RotateCcw, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw, Timer } from "lucide-react";
 
 interface ControlsProps {
 	onStart: () => void;

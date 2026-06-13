@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useReward } from "react-rewards";
 import {
 	Card,
@@ -51,6 +51,10 @@ export default function TimerApp() {
 	const [refreshSuggestion, setRefreshSuggestion] = useState<string | null>(
 		null,
 	);
+	// 提案取得フラグ
+	const [hasFetchedSuggestion, setHasFetchedSuggestion] = useState(false);
+	// 取得中かどうかを管理するRef（useStateより即時性が高く、二重実行を防ぐのに適している）
+	const isFetchingRef = useRef<boolean>(false);
 
 	// モードを切り替える関数
 	const toggleMode = () => {
@@ -65,15 +69,32 @@ export default function TimerApp() {
 			seconds: 0,
 		});
 
-		if (newMode === "break") {
-			generateRefreshSuggestion()
-				.then((suggestion) => setRefreshSuggestion(suggestion))
-				.catch(console.error);
-		}
-
-		// 自動開始がONの場合は次のセッションを自動的に開始
-		setIsRunning(autoStart);
+		// 提案取得フラグをリセット
+		setHasFetchedSuggestion(false);
+		isFetchingRef.current = false;
 	};
+
+	// リフレッシュ提案をタイマー実行中の休憩モード時のみ取得
+	useEffect(() => {
+		// すでに提案がある、取得済み、または現在取得中の場合は実行しない
+		if (
+			isRunning &&
+			mode === "break" &&
+			!hasFetchedSuggestion &&
+			!isFetchingRef.current
+		) {
+			isFetchingRef.current = true;
+			generateRefreshSuggestion()
+				.then((suggestion) => {
+					setRefreshSuggestion(suggestion);
+					setHasFetchedSuggestion(true);
+				})
+				.catch((error) => {
+					console.error(error);
+					isFetchingRef.current = false; // エラー時は再試行可能にするために解除
+				});
+		}
+	}, [isRunning, mode, hasFetchedSuggestion]);
 
 	// 開始/停止ボタンのハンドラ
 	const handleStart = () => {
@@ -89,8 +110,13 @@ export default function TimerApp() {
 		});
 	};
 
+	// 提案を閉じるハンドラ（メモ化して再レンダリングによるタイマーリセットを防ぐ）
+	const handleCloseSuggestion = useCallback(() => {
+		setRefreshSuggestion(null);
+	}, []);
+
 	useEffect(() => {
-		// setIntervelの戻り値（タイマーID）を保持する変数
+		// setIntervalの戻り値（タイマーID）を保持する変数
 		let intervalId: NodeJS.Timeout;
 
 		// タイマーが実行中の場合のみ処理を行う
@@ -112,6 +138,9 @@ export default function TimerApp() {
 							// 少し遅延させてからモード切り替えと自動開始を実行
 							setTimeout(() => {
 								toggleMode(); // モードを自動切り替え
+								if (autoStart) {
+									setIsRunning(true); // 自動開始がONの場合は次のセッションを開始
+								}
 							}, 100);
 							return prev; // 現在の状態（0分0秒）を返す
 						}
@@ -131,7 +160,7 @@ export default function TimerApp() {
 				clearInterval(intervalId);
 			}
 		};
-	}, [isRunning]); // isRunningが変わったときだけこのエフェクトを再実行
+	}, [isRunning, mode, autoStart]); // 依存配列に mode と autoStart を追加
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
@@ -161,13 +190,14 @@ export default function TimerApp() {
 				<CardFooter className="flex flex-col gap-4 w-full max-w-[200px] mx-auto">
 					{/* 作業時間の設定 */}
 					<div className="flex items-center gap-2">
-						<label className="text-sm font-medium min-w-[4.5rem]">
+						<label className="text-sm font-medium min-w-18">
 							作業時間
+							<input type="hidden" />
 						</label>
 						<select
 							value={workDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value);
+								const newDuration = parseInt(e.target.value, 10);
 								setWorkDuration(newDuration);
 								if (mode === "work" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
@@ -185,13 +215,14 @@ export default function TimerApp() {
 
 					{/* 休憩時間の設定 */}
 					<div className="flex items-center gap-2">
-						<label className="text-sm font-medium min-w-[4.5rem]">
+						<label className="text-sm font-medium min-w-18">
 							休憩時間
+							<input type="hidden" />
 						</label>
 						<select
 							value={breakDuration}
 							onChange={(e) => {
-								const newDuration = parseInt(e.target.value);
+								const newDuration = parseInt(e.target.value, 10);
 								setBreakDuration(newDuration);
 								if (mode === "break" && !isRunning) {
 									setTimeLeft({ minutes: newDuration, seconds: 0 });
@@ -209,8 +240,9 @@ export default function TimerApp() {
 
 					{/* 自動開始の設定 */}
 					<div className="flex items-center gap-2 w-full justify-between">
-						<label className="text-sm font-medium min-w-[4.5rem]">
+						<label className="text-sm font-medium min-w-18">
 							自動開始
+							<input type="hidden" />
 						</label>
 						<Switch
 							checked={autoStart}
@@ -227,7 +259,7 @@ export default function TimerApp() {
 			/>
 			<RefreshSuggestion
 				suggestion={refreshSuggestion}
-				onClose={() => setRefreshSuggestion(null)}
+				onClose={handleCloseSuggestion}
 			/>
 		</div>
 	);

@@ -31,6 +31,7 @@ export default function RefreshSuggestion({
 					className="fixed -bottom-4 left-1/2 transform -translate-x-1/2 bg-indigo-50 p-6 rounded-lg shadow-lg border border-indigo-200 w-full max-w-md"
 				>
 					<button
+						type="button"
 						onClick={onClose}
 						className="absolute top-3 right-3 text-indigo-400 hover:text-indigo-600 cursor-pointer"
 					>
